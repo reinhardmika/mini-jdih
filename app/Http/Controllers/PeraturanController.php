@@ -21,7 +21,7 @@ class PeraturanController extends Controller
 
         if ($request->filled('kategori')) {
             $query->whereHas('kategori', function ($q) use ($request) {
-                $q->whereIn('slug', $request->kategori);
+                $q->whereIn('slug', (array) $request->kategori);
             });
         }
 
