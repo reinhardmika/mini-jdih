@@ -31,7 +31,7 @@
                                     type="checkbox"
                                     name="kategori[]"
                                     value="{{ $kat->slug }}"
-                                    {{ in_array($kat->slug, request('kategori', [])) ? 'checked' : '' }}
+                                    {{ in_array($kat->slug, (array) request('kategori', [])) ? 'checked' : '' }}
                                     class="rounded border-ink-900/30 text-ink-900 focus:ring-brass"
                                 >
                                 {{ $kat->nama }}
