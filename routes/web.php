@@ -9,7 +9,18 @@ Route::get('/peraturan', [PeraturanController::class, 'index'])->name('peraturan
 Route::get('/peraturan/{peraturan:slug}', [PeraturanController::class, 'show'])->name('peraturan.show');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $kategoriChart = \App\Models\Kategori::withCount('peraturan')->get();
+
+    $kategoriLabels = $kategoriChart->pluck('singkatan');
+    $kategoriData = $kategoriChart->pluck('peraturan_count')->map(fn($v) => (int) $v);
+
+    $statusChart = [
+        'berlaku' => (int) \App\Models\Peraturan::where('status', 'berlaku')->count(),
+        'diubah' => (int) \App\Models\Peraturan::where('status', 'diubah')->count(),
+        'dicabut' => (int) \App\Models\Peraturan::where('status', 'dicabut')->count(),
+    ];
+
+    return view('dashboard', compact('kategoriLabels', 'kategoriData', 'statusChart', 'kategoriChart'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

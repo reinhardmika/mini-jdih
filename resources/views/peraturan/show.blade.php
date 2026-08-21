@@ -103,7 +103,7 @@
                 <h2 class="font-semibold text-ink-900 mb-4">Dokumen Peraturan</h2>
 
                 @if ($peraturan->file_path)
-                    <div class="border border-ink-900/10 rounded-md overflow-hidden mb-4 h-[400px] md:h-[600px]">
+                    <div class="border border-ink-900/10 rounded-md overflow-hidden mb-4 h-[500px] md:h-[700px]">
                         <iframe src="{{ asset('storage/' . $peraturan->file_path) }}" class="w-full h-full"></iframe>
                     </div>
                     <a href="{{ asset('storage/' . $peraturan->file_path) }}" target="_blank"

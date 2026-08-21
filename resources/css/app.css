@@ -3,3 +3,17 @@
 @tailwind utilities;
 
 [x-cloak] { display: none !important; }
+
+body {
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(45deg, #14213D 0, #14213D 1px, transparent 1px, transparent 16px);
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+}

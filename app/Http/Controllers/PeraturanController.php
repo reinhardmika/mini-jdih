@@ -62,14 +62,15 @@ class PeraturanController extends Controller
 
     public function show(Peraturan $peraturan)
     {
-        // $viewedKey = 'viewed_peraturan_' . $peraturan->id;
+        $viewedKey = 'viewed_peraturan_' . $peraturan->id;
 
-        // if (!session()->has($viewedKey)) {
-        //     $peraturan->increment('views');
-        //     session()->put($viewedKey, true);
-        // }
-        $peraturan->increment('views');
+        if (!session()->has($viewedKey)) {
+            $peraturan->increment('views');
+            session()->put($viewedKey, true);
+        }
+        // $peraturan->increment('views');
 
         return view('peraturan.show', compact('peraturan'));
     }
+    
 }
