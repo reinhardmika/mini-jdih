@@ -18,6 +18,7 @@ class PeraturanController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('tentang', 'like', '%' . $request->search . '%')
+                ->orWhere('tahun', 'like', '%'.$request->search.'%')
                 ->orWhere('nomor', 'like', '%' . $request->search . '%');
             });
         }
@@ -54,6 +55,8 @@ class PeraturanController extends Controller
 
     public function store(Request $request)
     {
+        $peraturan = Peraturan::with('kategori');
+
         $validated = $request->validate([
             'kategori_id' => 'required|exists:kategori,id',
             'nomor' => 'required|string|max:50',
@@ -69,12 +72,20 @@ class PeraturanController extends Controller
         $validated['slug'] = Str::slug($validated['nomor'] . '-' . $validated['tahun'] . '-' . $validated['tentang']) . '-' . uniqid();
 
         if ($request->hasFile('file')) {
-            $validated['file_path'] = $request->file('file')->store('peraturan', 'public');
+            $file = $request->file('file');
+
+            $kategori = Kategori::find($validated['kategori_id']);
+            $singkatan = $kategori ? $kategori->singkatan : 'unknown';
+
+            $namaFile = Str::upper($singkatan) . '-' . $validated['nomor'] . '-' . $validated['tahun'] . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $validated['file_path'] = $file->storeAs('peraturan', $namaFile, 'public');
         }
 
         Peraturan::create($validated);
 
-        return redirect()->route('admin.peraturan.index')->with('success', 'Peraturan berhasil ditambahkan.');
+        return redirect()
+            ->route('admin.peraturan.index')
+            ->with('success', 'Peraturan berhasil ditambahkan.');
     }
 
     public function edit(Peraturan $peraturan)
@@ -101,12 +112,19 @@ class PeraturanController extends Controller
             if ($peraturan->file_path) {
                 Storage::disk('public')->delete($peraturan->file_path);
             }
-            $validated['file_path'] = $request->file('file')->store('peraturan', 'public');
+
+            $file = $request->file('file');
+            $singkatan = $peraturan->kategori->singkatan ?? 'DOC';
+            $namaFile = Str::upper($singkatan) . '-' . $validated['nomor'] . '-' . $validated['tahun'] . '.' . $file->getClientOriginalExtension();
+
+            $validated['file_path'] = $file->storeAs('peraturan', $namaFile, 'public');
         }
 
         $peraturan->update($validated);
 
-        return redirect()->route('admin.peraturan.index')->with('success', 'Peraturan berhasil diperbarui.');
+        return redirect()
+            ->route('admin.peraturan.index')
+            ->with('success', 'Peraturan berhasil diperbarui.');
     }
 
     public function destroy(Peraturan $peraturan)
@@ -114,8 +132,11 @@ class PeraturanController extends Controller
         if ($peraturan->file_path) {
             Storage::disk('public')->delete($peraturan->file_path);
         }
+        
         $peraturan->delete();
 
-        return redirect()->route('admin.peraturan.index')->with('success', 'Peraturan berhasil dihapus.');
+        return redirect()
+            ->route('admin.peraturan.index')
+            ->with('success', 'Peraturan berhasil dihapus.');
     }
 }

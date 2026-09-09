@@ -2,26 +2,30 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PeraturanController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PeraturanController::class, 'home'])->name('home');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/peraturan', [PeraturanController::class, 'index'])->name('peraturan.index');
+Route::get('/peraturan/suggest', [PeraturanController::class, 'suggest'])->name('peraturan.suggest');
 Route::get('/peraturan/{peraturan:slug}', [PeraturanController::class, 'show'])->name('peraturan.show');
+Route::get('/peraturan/{peraturan}/unduh', [PeraturanController::class, 'unduh'])->name('peraturan.unduh');
 
-Route::get('/dashboard', function () {
-    $kategoriChart = \App\Models\Kategori::withCount('peraturan')->get();
+// Route::get('/dashboard', function () {
+//     $kategoriChart = \App\Models\Kategori::withCount('peraturan')->get();
 
-    $kategoriLabels = $kategoriChart->pluck('singkatan');
-    $kategoriData = $kategoriChart->pluck('peraturan_count')->map(fn($v) => (int) $v);
+//     $kategoriLabels = $kategoriChart->pluck('singkatan');
+//     $kategoriData = $kategoriChart->pluck('peraturan_count')->map(fn($v) => (int) $v);
 
-    $statusChart = [
-        'berlaku' => (int) \App\Models\Peraturan::where('status', 'berlaku')->count(),
-        'diubah' => (int) \App\Models\Peraturan::where('status', 'diubah')->count(),
-        'dicabut' => (int) \App\Models\Peraturan::where('status', 'dicabut')->count(),
-    ];
+//     $statusChart = [
+//         'berlaku' => (int) \App\Models\Peraturan::where('status', 'berlaku')->count(),
+//         'diubah' => (int) \App\Models\Peraturan::where('status', 'diubah')->count(),
+//         'dicabut' => (int) \App\Models\Peraturan::where('status', 'dicabut')->count(),
+//     ];
 
-    return view('dashboard', compact('kategoriLabels', 'kategoriData', 'statusChart', 'kategoriChart'));
-})->middleware(['auth', 'verified'])->name('dashboard');
+//     return view('dashboard', compact('kategoriLabels', 'kategoriData', 'statusChart', 'kategoriChart'));
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

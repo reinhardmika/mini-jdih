@@ -4,6 +4,17 @@
 
 [x-cloak] { display: none !important; }
 
+@layer utilities {
+  .no-native-reveal::-ms-reveal,
+  .no-native-reveal::-ms-clear {
+    display: none;
+  }
+}
+
+html {
+    font-size: 17px;
+}
+
 body {
     position: relative;
 }

@@ -2,10 +2,10 @@
 
 @php
     $color = match($status) {
-        'berlaku' => 'text-emerald-700 border-emerald-700',
-        'dicabut' => 'text-seal border-seal',
-        'diubah' => 'text-brass border-brass',
-        default => 'text-ink-500 border-ink-500',
+        'berlaku'  => 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        'diubah'   => 'bg-amber-50 text-amber-800 border-amber-200',
+        'dicabut'  => 'bg-stone-50 text-rose-700 border-rose-200',
+        default    => 'bg-gray-50 text-gray-800 border-gray-200',
     };
 @endphp
 

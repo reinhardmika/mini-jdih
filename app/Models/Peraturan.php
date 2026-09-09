@@ -14,6 +14,14 @@ class Peraturan extends Model
         'views', 'file_path', 'sumber'
     ];
 
+    protected $casts = [
+        'tanggal_penetapan' => 'date',
+        'tanggal_diundangkan' => 'date',
+        'created_at' => 'datetime',
+        'views' => 'integer',
+        'downloads' => 'integer',
+    ];
+
     public function kategori()
     {
         return $this->belongsTo(Kategori::class);

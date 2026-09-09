@@ -4,91 +4,218 @@
 
 @section('content')
 
+    <nav class="text-sm text-ink-500 mb-4">
+        <a href="{{ route('admin.peraturan.index') }}" class="hover:text-ink-900">Kelola Peraturan</a>
+        <span class="mx-1">/</span>
+        <span class="text-ink-700">Tambah</span>
+    </nav>
+
     <h1 class="font-display text-2xl font-semibold text-ink-900 mb-6">Tambah Peraturan</h1>
 
-    <form action="{{ route('admin.peraturan.store') }}" method="POST" enctype="multipart/form-data"
-          class="bg-white border border-ink-900/10 rounded-lg p-6 space-y-5 max-w-2xl">
+    <form
+        action="{{ route('admin.peraturan.store') }}"
+        method="POST"
+        enctype="multipart/form-data"
+        class="bg-white border border-ink-900/10 rounded-lg p-6 space-y-5 max-w-2xl"
+        x-data="{
+            fileName: '',
+            status: @js(old('status', 'berlaku'))
+        }"
+    >
         @csrf
 
+        {{-- Kategori --}}
         <div>
-            <label class="block text-sm font-medium text-ink-700 mb-1.5">Kategori</label>
-            <select name="kategori_id" class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
+            <label for="kategori_id" class="block text-sm font-medium text-ink-700 mb-1.5">
+                Kategori <span class="text-rose-600">*</span>
+            </label>
+            <select
+                id="kategori_id"
+                name="kategori_id"
+                class="w-full border border-ink-900/20 rounded-md pl-3 pr-10 py-2 text-sm bg-white outline-none focus:border-brass @error('kategori_id') border-rose-400 @enderror"
+                required
+            >
                 <option value="">Pilih kategori</option>
                 @foreach ($kategori as $k)
-                    <option value="{{ $k->id }}" {{ old('kategori_id') == $k->id ? 'selected' : '' }}>
-                        {{ $k->nama }}
+                    <option value="{{ $k->id }}" @selected(old('kategori_id') == $k->id)>
+                        {{ $k->nama }} ({{ $k->singkatan }})
                     </option>
                 @endforeach
             </select>
-            @error('kategori_id') <p class="text-seal text-xs mt-1">{{ $message }}</p> @enderror
+            @error('kategori_id')
+                <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        {{-- Nomor & Tahun --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-ink-700 mb-1.5">Nomor</label>
-                <input type="text" name="nomor" value="{{ old('nomor') }}"
-                       class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
-                @error('nomor') <p class="text-seal text-xs mt-1">{{ $message }}</p> @enderror
+                <label for="nomor" class="block text-sm font-medium text-ink-700 mb-1.5">
+                    Nomor <span class="text-rose-600">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="nomor"
+                    name="nomor"
+                    value="{{ old('nomor') }}"
+                    placeholder="Contoh: 15"
+                    class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm font-mono outline-none focus:border-brass @error('nomor') border-rose-400 @enderror"
+                    required
+                >
+                @error('nomor')
+                    <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-ink-700 mb-1.5">Tahun</label>
-                <input type="number" name="tahun" value="{{ old('tahun') }}"
-                       class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
-                @error('tahun') <p class="text-seal text-xs mt-1">{{ $message }}</p> @enderror
+                <label for="tahun" class="block text-sm font-medium text-ink-700 mb-1.5">
+                    Tahun <span class="text-rose-600">*</span>
+                </label>
+                <input
+                    type="number"
+                    id="tahun"
+                    name="tahun"
+                    value="{{ old('tahun', date('Y')) }}"
+                    min="1900"
+                    max="{{ date('Y') }}"
+                    class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm font-mono outline-none focus:border-brass @error('tahun') border-rose-400 @enderror"
+                    required
+                >
+                @error('tahun')
+                    <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 
+        {{-- Tentang --}}
         <div>
-            <label class="block text-sm font-medium text-ink-700 mb-1.5">Tentang</label>
-            <textarea name="tentang" rows="3"
-                      class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">{{ old('tentang') }}</textarea>
-            @error('tentang') <p class="text-seal text-xs mt-1">{{ $message }}</p> @enderror
+            <label for="tentang" class="block text-sm font-medium text-ink-700 mb-1.5">
+                Tentang <span class="text-rose-600">*</span>
+            </label>
+            <textarea
+                id="tentang"
+                name="tentang"
+                rows="3"
+                placeholder="Contoh: Organisasi dan Tata Kerja Kejaksaan Republik Indonesia"
+                class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm outline-none focus:border-brass resize-y @error('tentang') border-rose-400 @enderror"
+                required
+            >{{ old('tentang') }}</textarea>
+            @error('tentang')
+                <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        {{-- Tanggal --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-ink-700 mb-1.5">Tanggal Penetapan</label>
-                <input type="date" name="tanggal_penetapan" value="{{ old('tanggal_penetapan') }}"
-                       class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
+                <label for="tanggal_penetapan" class="block text-sm font-medium text-ink-700 mb-1.5">
+                    Tanggal Penetapan
+                </label>
+                <input
+                    type="date"
+                    id="tanggal_penetapan"
+                    name="tanggal_penetapan"
+                    value="{{ old('tanggal_penetapan') }}"
+                    class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm outline-none focus:border-brass @error('tanggal_penetapan') border-rose-400 @enderror"
+                >
+                @error('tanggal_penetapan')
+                    <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-ink-700 mb-1.5">Tanggal Diundangkan</label>
-                <input type="date" name="tanggal_diundangkan" value="{{ old('tanggal_diundangkan') }}"
-                       class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
+                <label for="tanggal_diundangkan" class="block text-sm font-medium text-ink-700 mb-1.5">
+                    Tanggal Diundangkan
+                </label>
+                <input
+                    type="date"
+                    id="tanggal_diundangkan"
+                    name="tanggal_diundangkan"
+                    value="{{ old('tanggal_diundangkan') }}"
+                    class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm outline-none focus:border-brass @error('tanggal_diundangkan') border-rose-400 @enderror"
+                >
+                @error('tanggal_diundangkan')
+                    <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 
+        {{-- Status --}}
         <div>
-            <label class="block text-sm font-medium text-ink-700 mb-1.5">Status</label>
-            <select name="status" class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
-                <option value="berlaku" {{ old('status') == 'berlaku' ? 'selected' : '' }}>Berlaku</option>
-                <option value="diubah" {{ old('status') == 'diubah' ? 'selected' : '' }}>Diubah</option>
-                <option value="dicabut" {{ old('status') == 'dicabut' ? 'selected' : '' }}>Dicabut</option>
-            </select>
+            <label class="block text-sm font-medium text-ink-700 mb-2">
+                Status <span class="text-rose-600">*</span>
+            </label>
+            <div class="flex flex-wrap gap-2">
+                @foreach (['berlaku' => 'Berlaku', 'diubah' => 'Diubah', 'dicabut' => 'Dicabut'] as $value => $label)
+                    <label class="cursor-pointer">
+                        <input type="radio" name="status" value="{{ $value }}" class="peer sr-only"
+                               @checked(old('status', 'berlaku') === $value)
+                               x-model="status">
+                        <span @class([
+                            'inline-block px-3 py-1.5 text-xs rounded-full border transition',
+                            'border-emerald-200 text-emerald-700 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600' => $value === 'berlaku',
+                            'border-amber-200 text-amber-700 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500' => $value === 'diubah',
+                            'border-rose-200 text-rose-700 peer-checked:bg-rose-600 peer-checked:text-white peer-checked:border-rose-600' => $value === 'dicabut',
+                        ])>
+                            {{ $label }}
+                        </span>
+                    </label>
+                @endforeach
+            </div>
+            @error('status')
+                <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
+        {{-- Sumber --}}
         <div>
-            <label class="block text-sm font-medium text-ink-700 mb-1.5">Sumber</label>
-            <input type="text" name="sumber" value="{{ old('sumber') }}" placeholder="misal: Lembaran Negara No. 45 Tahun 2023"
-                   class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm focus:border-brass outline-none">
+            <label for="sumber" class="block text-sm font-medium text-ink-700 mb-1.5">Sumber</label>
+            <input
+                type="text"
+                id="sumber"
+                name="sumber"
+                value="{{ old('sumber') }}"
+                placeholder="Contoh: LN 2024 (28) : 15 hlm.; jdih.setneg.go.id"
+                class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm outline-none focus:border-brass @error('sumber') border-rose-400 @enderror"
+            >
+            @error('sumber')
+                <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
+        {{-- File PDF --}}
         <div>
-            <label class="block text-sm font-medium text-ink-700 mb-1.5">File PDF</label>
-            <input type="file" name="file" accept=".pdf"
-                   class="w-full border border-ink-900/20 rounded-md px-3 py-2 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-ink-900 file:text-paper file:text-xs">
-            @error('file') <p class="text-seal text-xs mt-1">{{ $message }}</p> @enderror
+            <label for="file" class="block text-sm font-medium text-ink-700 mb-1.5">File PDF</label>
+            <div class="border border-dashed border-ink-900/20 rounded-md px-4 py-6 text-center hover:border-brass transition-colors">
+                <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    accept=".pdf,application/pdf"
+                    class="hidden"
+                    @change="fileName = $event.target.files[0]?.name || ''"
+                >
+                <label for="file" class="cursor-pointer">
+                    <div class="text-ink-500 text-sm">
+                        <span class="font-medium text-ink-800">Pilih file PDF</span>
+                        <span class="block text-xs mt-1 text-ink-400">Maks. 10 MB</span>
+                    </div>
+                    <p class="text-xs text-ink-600 mt-2 font-mono" x-text="fileName || 'Belum ada file dipilih'"></p>
+                </label>
+            </div>
+            @error('file')
+                <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="flex gap-3 pt-2">
-            <button type="submit" class="bg-ink-900 text-paper px-6 py-2.5 rounded-md text-sm font-medium hover:bg-seal transition-colors">
-                Simpan
+        <div class="flex flex-wrap gap-3 pt-2 border-t border-ink-900/5">
+            <button type="submit"
+                    class="bg-ink-900 text-paper px-6 py-2.5 rounded-md text-sm font-medium hover:bg-teal-700 transition-colors">
+                Simpan Peraturan
             </button>
-            <a href="{{ route('admin.peraturan.index') }}" class="border border-ink-900/20 px-6 py-2.5 rounded-md text-sm text-ink-700 hover:bg-paper-alt">
+            <a href="{{ route('admin.peraturan.index') }}"
+               class="border border-ink-900/20 px-6 py-2.5 rounded-md text-sm text-ink-700 hover:bg-paper-alt transition-colors">
                 Batal
             </a>
         </div>
-
     </form>
 
 @endsection
